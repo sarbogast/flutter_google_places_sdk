@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,19 +28,21 @@ class FlutterGooglePlacesSdkMethodChannel
     return _channel.invokeMethod<void>('deinitialize');
   }
 
+  @override
   Future<void> updateSettings(String apiKey, {Locale? locale}) {
     return _invokeForSettings('updateSettings', apiKey, locale);
   }
 
-  Future<void> _invokeForSettings(String methodName, String apiKey, Locale? locale) {
+  Future<void> _invokeForSettings(
+      String methodName, String apiKey, Locale? locale) {
     return _channel.invokeMethod<void>(methodName, {
       'apiKey': apiKey,
       'locale': locale == null
           ? null
           : {
-        'country': locale.countryCode,
-        'language': locale.languageCode,
-      },
+              'country': locale.countryCode,
+              'language': locale.languageCode,
+            },
     });
   }
 
@@ -88,7 +89,7 @@ class FlutterGooglePlacesSdkMethodChannel
   @override
   Future<FetchPlaceResponse> fetchPlace(
     String placeId, {
-    required List<PlaceField> fields,
+    required List<PlaceField>? fields,
     bool? newSessionToken,
   }) {
     return _channel.invokeMapMethod(
@@ -129,8 +130,7 @@ class FlutterGooglePlacesSdkMethodChannel
 
   FetchPlacePhotoResponse _responseFromPlacePhoto(dynamic value) {
     if (value is Uint8List) {
-      final image = Image.memory(value);
-      return FetchPlacePhotoResponse.image(image);
+      return FetchPlacePhotoResponse.imageData(value);
     }
 
     if (value is String) {
